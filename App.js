@@ -2,19 +2,10 @@ import React from 'react';
 import {FlatList, ActivityIndicator, Text, View } from 'react-native'; 
 import {ThemeProvider, Header, ListItem, Button, Icon } from 'react-native-elements';
 
-
-// 777 fdf
-
-
-
-
-
 export default class FetchExample extends React.Component {
 
 
-
     constructor(props) {
-      console.log("начало цыкла");
       super(props);
       this.state = {
         isLoading: true,
@@ -23,158 +14,79 @@ export default class FetchExample extends React.Component {
     }
 
     fetchData() {
-      // function deepEqual(obj1, obj2) { // проверка равенства обектов
-      //   return JSON.stringify(obj1) === JSON.stringify(obj2);
-      // }
       return fetch('https://api.exmo.com/v1/ticker/').then((response) => response.json()).then((responseJson) => {
         var oldObj = responseJson;
-        var currencyName;
-        var productVersionArray;
         var newObj = [];
-        //var options =  ["BTC_USD", "BTC_UAH", "BTC_EUR", "ETH_USD", "XRP_USD", "NEO_USD"];
-        var options = ["BTC_USD"];
+        var intermediateObj = [];
+        var currencyName;     
         var rounded_last_trade;
-        for (currencyName in oldObj) {
-          if (options.indexOf(currencyName) != -1) { // выборка валют
-            productVersionArray = oldObj[currencyName];
-            
 
-            switch (currencyName) {
+        var options =  ["BTC_USD",  "ETH_USD", "XRP_USD"]; 
+        var arrowsObj = {
+          blank: "http://www.avocadocafe.com.ua/icon/arrow_blank.png",
+          right: "http://www.avocadocafe.com.ua/icon/arrow_right.png",
+          up:    "http://www.avocadocafe.com.ua/icon/arrow-up_green.png",
+          down:  "http://www.avocadocafe.com.ua/icon/arrow-down_red.png", 
+        }
+        for (currencyName in oldObj) {
+          if (options.indexOf(currencyName) != -1) { // filter options
+            intermediateObj = oldObj[currencyName];
+          
+            switch (currencyName) {  // round price
               case 'BTC_USD':
-                rounded_last_trade = parseFloat(productVersionArray.last_trade).toFixed(0);
+                rounded_last_trade = parseFloat(intermediateObj.last_trade).toFixed(0);
                 break;
               case 'ETH_USD':
-                rounded_last_trade = parseFloat(productVersionArray.last_trade).toFixed(0);
+                rounded_last_trade = parseFloat(intermediateObj.last_trade).toFixed(0);
                 break;
               case 'XRP_USD':
-                rounded_last_trade = parseFloat(productVersionArray.last_trade).toFixed(6);
+                rounded_last_trade = parseFloat(intermediateObj.last_trade).toFixed(6);
                 break;
               default:
-                rounded_last_trade = parseFloat(productVersionArray.last_trade).toFixed(0);
+                rounded_last_trade = parseFloat(intermediateObj.last_trade).toFixed(0);
             }
-            
-
-            
-              newObj.push({
-                name: currencyName,
-                last_trade: rounded_last_trade,
-                arrow: 'http://www.avocadocafe.com.ua/icon/arrow_blank.png'
-               
-              });
-
-        
-
+                     
+            newObj.push({
+              name: currencyName,
+              last_trade: rounded_last_trade,
+              arrow: arrowsObj.blank        
+            });
 
           } // endif
         }
-        // console.log(typeof this.state.OldDataSource);
-        if (typeof this.state.OldDataSource !== "undefined") {
-          // console.log("Старый");
-          // console.log(this.state.OldDataSource);
-          // console.log("Новый");
-          // console.log(this.state.dataSource);
-          // if ( !deepEqual (this.state.OldDataSource, this.state.dataSource)){
-          //console.log(this.state.OldDataSource);
-          //console.log(this.state.dataSource);
-          //console.log(newObj); 
+        
+        if (typeof this.state.OldDataSource !== "undefined") { 
+
           for (i = 0; i < newObj.length; i++) {
-           
+            // show arorows if price has changed
             if (parseFloat(this.state.OldDataSource[i].last_trade) > parseFloat(this.state.dataSource[i].last_trade)) {
-              // console.log("Замениласб стрелка");
-              newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-down_red.png';
-              this.state.dataSource[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-down_red.png';
-              console.log(this.state.OldDataSource[i].last_trade);
-              console.log(">");
-              console.log(this.state.dataSource[i].last_trade);
-              // console.log(this.state.dataSource[i].arrow);
-              // console.log(newObj[i].arrow);
-              console.log("Старый Data");       
-              console.log(this.state.OldDataSource[i]);   // right 
-              console.log("");
-
-              console.log("Текущий Data");     
-              console.log(this.state.dataSource[i]);    // green 
-              console.log("");
-
-              console.log("Новый Data");        // right 
-              console.log(newObj[i]);
-              console.log("");              
+              
+                newObj[i].arrow = arrowsObj.down;
+                //this.state.dataSource[i].arrow = arrowsObj.down;
+               
             } else if (parseFloat(this.state.OldDataSource[i].last_trade) < parseFloat(this.state.dataSource[i].last_trade)) {
-              // console.log("Замениласб стрелка");
-              newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-up_green.png';
-              this.state.dataSource[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-up_green.png';
-              console.log(this.state.OldDataSource[i].last_trade);
-              console.log("<");
-              console.log(this.state.dataSource[i].last_trade);
-              // console.log(this.state.dataSource[i].arrow);
-              // console.log(newObj[i].arrow);
-              console.log("Старый Data");       
-              console.log(this.state.OldDataSource[i]);   // right 
-              console.log("");
+              
+                newObj[i].arrow = arrowsObj.up;
+                //this.state.dataSource[i].arrow = arrowsObj.up;
+            
+            } else  {                  
 
-              console.log("Текущий Data");     
-              console.log(this.state.dataSource[i]);    // green 
-              console.log("");
-
-              console.log("Новый Data");        // right 
-              console.log(newObj[i]);
-              console.log("");              
-            } else  { 
-              console.log("Равно");
-               //newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow_right.png';
-             
-                 if (this.state.OldDataSource[i].arrow == "http://www.avocadocafe.com.ua/icon/arrow-down_red.png") {
-                     newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-down_red.png';
-                 } else if (this.state.OldDataSource[i].arrow == "http://www.avocadocafe.com.ua/icon/arrow-up_green.png") {
-                     newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-up_green.png';
-                 } 
-                else {
-                     newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow_right.png';
-                 }  
-              // switch (this.state.OldDataSource[i].arrow) { // хз иди this.state.dataSource[i].arrow
-              //   case 'http://www.avocadocafe.com.ua/icon/arrow-down_red.png':
-              //     newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-down_red.png';
-              //     break;
-              //   case 'http://www.avocadocafe.com.ua/icon/arrow-up_green.png':
-              //     newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow-up_green.png';
-              //     break;
-              //   default:
-              //     newObj[i].arrow = 'http://www.avocadocafe.com.ua/icon/arrow_right.png';
-              // }
-              console.log(this.state.OldDataSource[i].last_trade);
-              console.log("==");
-              console.log(this.state.dataSource[i].last_trade);
-
-              console.log("Старый Data");       
-              console.log(this.state.OldDataSource[i]);   // right 
-              console.log("");
-
-              console.log("Текущий Data");     
-              console.log(this.state.dataSource[i]);    // green 
-              console.log("");
-
-              console.log("Новый Data");        // right 
-              console.log(newObj[i]);
-              console.log("");
-              // console.log(newObj[i]);
-            }
-            //console.log(this.state.OldDataSource[i].arrow);
-            // console.log(this.state.OldDataSource[i].arrow);
-            // console.log(this.state.dataSource[i].arrow);          
-          
-
-          } //end for
-         
-          
+               if (this.state.OldDataSource[i].arrow == arrowsObj.down) {
+                   newObj[i].arrow = arrowsObj.down;
+               } else if (this.state.OldDataSource[i].arrow == arrowsObj.up) {
+                   newObj[i].arrow = arrowsObj.up;
+               } else {
+                   newObj[i].arrow = arrowsObj.right;
+               }  
+              
+            }       
+          } //end for        
         } //end if undefined
-
 
         this.setState({
           isLoading: false,
           dataSource: newObj
-          //OldDataSource: newObj
         });
-
 
       }).then(() => {
 
@@ -182,26 +94,19 @@ export default class FetchExample extends React.Component {
         console.error(error);
       });
     }
+
     componentDidMount(prevProps, prevState) {
-      console.log("componentDidMount");
       this.fetchData();
       this.timer = setInterval(() => this.fetchData(), 5000);
-
- 
-
-
     }
+
     componentWillUnmount() {
-      console.log("componentWillUnmount");
       clearInterval(this.componentWillUnmount);
       this.timer = null;
     } 
-    // shouldComponentUpdate(nextProps, nextState) {
-    //   return true;
-    // }
-    componentDidUpdate(prevProps, prevState) {
-      if (typeof prevState.dataSource !== "undefined") {
 
+    componentDidUpdate(prevProps, prevState) { // get old State
+      if (typeof prevState.dataSource !== "undefined") {
         if (prevState.dataSource !== this.state.dataSource) {
            console.log("componentDidUpdate");
           this.setState({
@@ -209,29 +114,9 @@ export default class FetchExample extends React.Component {
           });
         }
       }
-
-          
-      // if ( typeof prevState.dataSource !== "undefined") {
-      //     // console.log(prevState.dataSource[0].last_trade);
-      //     // console.log(this.state.dataSource[0].last_trade);
-      //     if (prevState.dataSource[0].last_trade < this.state.dataSource[0].last_trade) {
-      //        console.log("Стало большеееееееееееееееее");
-      //     } else if (prevState.dataSource[0].last_trade > this.state.dataSource[0].last_trade) {
-      //        console.log("Стало меньшееееееееееееееееее");
-      //     } else {
-      //       //console.log("не изменилось");
-      //     }
-      // }
-       console.log("-----------------------");
     }
 
-
-
-
- // _keyExtractor = (item, index) => item.iditem.toString();
-
   render(){
-
     if(this.state.isLoading){
       return(
         <View style={{flex: 1, padding: 20}}>
@@ -240,16 +125,7 @@ export default class FetchExample extends React.Component {
       )
     }
 
-    return(
-
-      // <View style={{flex: 1, paddingTop:20}}>
-      //   <FlatList
-      //     data={this.state.dataSource}
-      //     renderItem={({item}) => <Text> {item.name} , {item.last_trade}</Text>}
-      //     keyExtractor={this._keyExtractor}
-      //   />
-      // </View>
- 
+    return( 
       <ThemeProvider>
         <Header
           statusBarProps={{ barStyle: 'light-content' }}
