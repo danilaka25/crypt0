@@ -1,4 +1,4 @@
-Show crypto currency from Exmo.com Public API 2<br>
+Show crypto currency from Exmo.com Public API<br>
 (https://exmo.com/uk/api)<br>
 <br>
 <br>
